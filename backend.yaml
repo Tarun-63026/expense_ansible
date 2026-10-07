@@ -21,7 +21,7 @@
        - mysql
 
    - name: add the user
-     ansbile.builtin.user:
+     ansible.builtin.user:
       name: expense
 
    - name: create a directory
