@@ -3,7 +3,7 @@
   become: yes
   vars:
     login_password: ExpenseApp@1
-    login_host: database.lukalapu.online
+    login_host: db.lukalapu.online
 
   tasks:
    - name: disable node.js:18
@@ -71,7 +71,8 @@
       daemon_reload: true
  
    - name: start and enable the backend service
-     ansible.builtin.service:
+     ansible.builtin.systemd_service:
       name: backend
       state: started
       enabled: yes
+      masked: no
