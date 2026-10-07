@@ -1,0 +1,83 @@
+- name: config backend
+  hosts: backend
+  become: yes
+  vars:
+    login_password: ExpenseApp@1
+    login_host: backend.lukalapu.online
+
+  tasks:
+   - name: disable node.js:18
+     ansible.builtin.command: "dnf module disbale nodejs -y"
+
+   - name: enable node.js:20
+     ansible.builtin.command: "dnf module enable nodejs:20 -y"
+
+   - name: install nodejs and mysql
+     ansible.builtin.dnf:
+      name: "{{ item }}"
+      state: installed
+      loop:
+       - nodejs
+       - mysql
+
+   - name: add the user
+     ansbile.builtin.user:
+      name: expense
+
+   - name: create a directory
+     ansible.builtin.file:
+      path: /app
+      state: directory
+
+   - name: download the code in app directory
+     ansible.builtin.get_url:
+      url: https://expense-builds.s3.us-east-1.amazonaws.com/expense-backend-v2.zip
+      path: /tmp/backend.zip
+     
+   - name: unzipping the code 
+     ansible.builtin.unarchive:
+      src: /tmp/backend.zip
+      dest: /app
+      remote_src: yes
+  
+   - name: download the dependencies
+     ansible.builtin.command: "npm install"
+     args:
+      ch_dir: /app
+  
+   - name: copy backend service
+     ansible.builtin.copy:
+      src: backend.service
+      dest: /etc/systemd/system/backend.service
+
+   - name: Install Python MySQL dependencies
+     ansible.builtin.pip:
+      name:
+        - PyMySQL     # to connect mysql db from ansible
+        - cryptography # Required for password handling
+      executable: pip3.9 # Set based on your target 'ansible --version
+
+   - name: import data into mysql
+     community.mysql.mysql_db:
+      login_user: root
+      login_password: "{{ login_password }}"
+      login_host: "{{ login_host }}"
+      target: /app/schema/backend.sql
+      state: import
+      name: all
+   
+   - name: daemon reload backend
+     ansible.builtin.systemd_service:
+     daemon_reload: true
+ 
+   - name: start and enable the backend service
+     ansible.builtin.service:
+     name: backend
+     state: started
+     enabled: yes
+
+
+
+
+
+  
