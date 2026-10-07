@@ -10,7 +10,7 @@
      ansible.builtin.command: "dnf module disbale nodejs -y"
 
    - name: enable node.js:20
-     ansible.builtin.command: "dnf module enable nodejs:20 -y"
+     ansible.builtin.command: "dnf module enable nodejs -y"
 
    - name: install nodejs and mysql
      ansible.builtin.dnf:
