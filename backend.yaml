@@ -3,7 +3,7 @@
   become: yes
   vars:
     login_password: ExpenseApp@1
-    login_host: backend.lukalapu.online
+    login_host: backend
 
   tasks:
    - name: disable node.js:18
