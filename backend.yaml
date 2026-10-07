@@ -45,6 +45,11 @@
      args:
       chdir: /app
   
+   - name: clear masked service symlink if it exists
+     ansible.builtin.file:
+      path: /etc/systemd/system/backend.service
+      state: absent
+
    - name: copy backend service
      ansible.builtin.copy:
       src: backend.service
@@ -75,4 +80,3 @@
       name: backend
       state: started
       enabled: yes
-      masked: no
